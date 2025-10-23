@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://v3egggqcg8ho"]
+
+[ext_resource type="Texture2D" uid="uid://deln2yj224a5m" path="res://assets/img/ledges/ledge96wide.png" id="1_ynt2l"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_yp5bp"]
+size = Vector2(384, 48.25)
+
+[node name="Ledge48" type="StaticBody2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(4, 4)
+texture = ExtResource("1_ynt2l")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -0.125)
+shape = SubResource("RectangleShape2D_yp5bp")
+one_way_collision = true

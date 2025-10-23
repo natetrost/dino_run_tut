@@ -1,6 +1,15 @@
-[gd_scene load_steps=2 format=3 uid="uid://lyf4a3sklk1o"]
+[gd_scene load_steps=5 format=3 uid="uid://lyf4a3sklk1o"]
 
 [ext_resource type="FontFile" uid="uid://s15272omc2m3" path="res://assets/fonts/retro.ttf" id="1_xwrdd"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ahhtf"]
+bg_color = Color(0.172549, 0.564706, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_oo0fn"]
+bg_color = Color(0.6, 0.52549, 0.937255, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5ysmq"]
+bg_color = Color(0, 0.682353, 0.713726, 1)
 
 [node name="HUD" type="CanvasLayer"]
 
@@ -27,7 +36,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_fonts/font = ExtResource("1_xwrdd")
 theme_override_font_sizes/font_size = 40
-text = "PRESS SPACE TO PLAY"
+text = "PRESS JUMP TO PLAY"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -43,3 +52,39 @@ theme_override_font_sizes/font_size = 40
 text = "HIGH SCORE: "
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="JumpButton" type="Button" parent="."]
+offset_left = 42.0
+offset_top = 75.0
+offset_right = 292.0
+offset_bottom = 130.0
+theme_override_fonts/font = ExtResource("1_xwrdd")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/normal = SubResource("StyleBoxFlat_ahhtf")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_oo0fn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_5ysmq")
+text = "JUMP"
+
+[node name="DuckButton" type="Button" parent="."]
+offset_left = 342.0
+offset_top = 75.0
+offset_right = 592.0
+offset_bottom = 130.0
+theme_override_fonts/font = ExtResource("1_xwrdd")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/normal = SubResource("StyleBoxFlat_ahhtf")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_oo0fn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_5ysmq")
+text = "DUCK"
+
+[node name="SlowButton" type="Button" parent="."]
+offset_left = 642.0
+offset_top = 75.0
+offset_right = 892.0
+offset_bottom = 130.0
+theme_override_fonts/font = ExtResource("1_xwrdd")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/normal = SubResource("StyleBoxFlat_ahhtf")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_oo0fn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_5ysmq")
+text = "SLOW"

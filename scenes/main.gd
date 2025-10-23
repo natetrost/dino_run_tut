@@ -5,9 +5,14 @@ var stump_scene = preload("res://scenes/stump.tscn")
 var rock_scene = preload("res://scenes/rock.tscn")
 var barrel_scene = preload("res://scenes/barrel.tscn")
 var bird_scene = preload("res://scenes/bird.tscn")
+var ledge48_scene = preload("res://scenes/ledge48.tscn")
+var ledge96_scene = preload("res://scenes/ledge96.tscn")
 var obstacle_types := [stump_scene, rock_scene, barrel_scene]
+var ledge_types := [ledge48_scene, ledge96_scene]
 var obstacles : Array
+var ledges : Array
 var bird_heights := [200, 390]
+var ledge_heights := [260, 300]
 
 #game variables
 const DINO_START_POS := Vector2i(150, 485)
@@ -18,6 +23,12 @@ var score : int
 const SCORE_MODIFIER : int = 10
 var high_score : int
 var speed : float
+var slow_modifier : float
+var slow_remaining : float
+var slow_last_delta : float
+const SLOW_MOD_START = 0.2
+const SLOW_MOD_TIME = 0.6
+const SLOW_COOLDOWN = 2.0
 const START_SPEED : float = 10.0
 const MAX_SPEED : int = 25
 const SPEED_MODIFIER : int = 5000
@@ -25,6 +36,7 @@ var screen_size : Vector2i
 var ground_height : int
 var game_running : bool
 var last_obs
+var last_ledge
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -35,6 +47,8 @@ func _ready():
 
 func new_game():
 	#reset variables
+	slow_modifier = 1.0
+	slow_last_delta = SLOW_COOLDOWN
 	score = 0
 	show_score()
 	game_running = false
@@ -45,6 +59,11 @@ func new_game():
 	for obs in obstacles:
 		obs.queue_free()
 	obstacles.clear()
+
+	#delete all ledges
+	for ledge in ledges:
+		ledge.queue_free()
+	ledges.clear()
 	
 	#reset the nodes
 	$Dino.position = DINO_START_POS
@@ -59,6 +78,24 @@ func new_game():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	if game_running:
+		if Input.is_action_pressed("ui_left") and slow_last_delta > SLOW_COOLDOWN:
+			Input.action_release("ui_left")
+			var dino_sprite = $Dino.get_node("AnimatedSprite2D")	
+			if dino_sprite.animation == "run":
+				slow_modifier = SLOW_MOD_START
+				slow_remaining = SLOW_MOD_TIME
+				slow_last_delta = 0.0
+				$HUD.get_node("SlowButton").disabled = true
+		else:
+			var slow_button = $HUD.get_node("SlowButton")
+			slow_last_delta += delta
+			if (slow_last_delta > SLOW_COOLDOWN):
+				slow_button.disabled = false
+				slow_button.text = "SLOW"
+			else:
+				slow_button.text = "%.2f" % (SLOW_COOLDOWN - slow_last_delta)
+				
+			
 		#speed up and adjust difficulty
 		speed = START_SPEED + score / SPEED_MODIFIER
 		if speed > MAX_SPEED:
@@ -68,10 +105,20 @@ func _process(delta):
 		#generate obstacles
 		generate_obs()
 		
-		#move dino and camera
-		$Dino.position.x += speed
-		$Camera2D.position.x += speed
+		#generate ledges
+		generate_ledge()
 		
+		#move dino and camera
+		$Dino.position.x += (speed * slow_modifier)
+		$Camera2D.position.x += (speed * slow_modifier)
+		
+		#update slow modifier
+		if (slow_modifier < 1.0):
+			slow_remaining -= delta
+			var dino_sprite = $Dino.get_node("AnimatedSprite2D")
+			if (slow_remaining < 0.0) or dino_sprite.animation != "run":
+				slow_modifier = 1.0
+
 		#update score
 		score += speed
 		show_score()
@@ -84,10 +131,28 @@ func _process(delta):
 		for obs in obstacles:
 			if obs.position.x < ($Camera2D.position.x - screen_size.x):
 				remove_obs(obs)
+				
+		#remove ledge that have gone offscreen
+		for ledge in ledges:
+			if ledge.position.x < ($Camera2D.position.x - screen_size.x):
+				ledge.queue_free()
+				ledges.erase(ledge)
+			
 	else:
 		if Input.is_action_pressed("ui_accept"):
 			game_running = true
 			$HUD.get_node("StartLabel").hide()
+
+func generate_ledge():
+	if ledges.is_empty() or last_ledge.position.x < score + randi_range(300,600):
+		var ledge_type = ledge_types[randi() % ledge_types.size()]
+		var ledge = ledge_type.instantiate()
+		var ledge_x : int = screen_size.x + score + 100
+		var ledge_y = ledge_heights[randi() % ledge_heights.size()]
+		ledge.position = Vector2i(ledge_x, ledge_y)
+		add_child(ledge)
+		ledges.append(ledge)
+		last_ledge = ledge
 
 func generate_obs():
 	#generate ground obstacles

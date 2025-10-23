@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c4rlb0tycrggt"
-path="res://.godot/imported/plx-5.png-dab71000e655165af2aef034df3bf63e.ctex"
+uid="uid://deln2yj224a5m"
+path="res://.godot/imported/ledge96wide.png-be56fe9d752800df503c2ac3f3f8309c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/img/background/plx-5.png"
-dest_files=["res://.godot/imported/plx-5.png-dab71000e655165af2aef034df3bf63e.ctex"]
+source_file="res://assets/img/ledges/ledge96wide.png"
+dest_files=["res://.godot/imported/ledge96wide.png-be56fe9d752800df503c2ac3f3f8309c.ctex"]
 
 [params]
 
