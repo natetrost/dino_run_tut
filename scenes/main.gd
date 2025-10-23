@@ -7,10 +7,12 @@ var barrel_scene = preload("res://scenes/barrel.tscn")
 var bird_scene = preload("res://scenes/bird.tscn")
 var ledge48_scene = preload("res://scenes/ledge48.tscn")
 var ledge96_scene = preload("res://scenes/ledge96.tscn")
+var coin_scene = preload("res://scenes//coin.tscn")
 var obstacle_types := [stump_scene, rock_scene, barrel_scene]
 var ledge_types := [ledge48_scene, ledge96_scene]
 var obstacles : Array
 var ledges : Array
+var coins : Array
 var bird_heights := [200, 390]
 var ledge_heights := [260, 300]
 
@@ -32,6 +34,7 @@ const SLOW_COOLDOWN = 2.0
 const START_SPEED : float = 10.0
 const MAX_SPEED : int = 25
 const SPEED_MODIFIER : int = 5000
+const COIN_BONUS : int = 10
 var screen_size : Vector2i
 var ground_height : int
 var game_running : bool
@@ -64,6 +67,11 @@ func new_game():
 	for ledge in ledges:
 		ledge.queue_free()
 	ledges.clear()
+	
+	#delete all coins
+	for coin in coins:
+		coin.queue_free()
+	coins.clear()
 	
 	#reset the nodes
 	$Dino.position = DINO_START_POS
@@ -137,6 +145,12 @@ func _process(delta):
 			if ledge.position.x < ($Camera2D.position.x - screen_size.x):
 				ledge.queue_free()
 				ledges.erase(ledge)
+
+		#remove coins that have gone offscreen
+		for coin in coins:
+			if coin.position.x < ($Camera2D.position.x - screen_size.x):
+				coin.queue_free()
+				coins.erase(coin)
 			
 	else:
 		if Input.is_action_pressed("ui_accept"):
@@ -149,10 +163,20 @@ func generate_ledge():
 		var ledge = ledge_type.instantiate()
 		var ledge_x : int = screen_size.x + score + 100
 		var ledge_y = ledge_heights[randi() % ledge_heights.size()]
+		var ledge_w = ledge.get_node("Sprite2D").texture.get_width()
 		ledge.position = Vector2i(ledge_x, ledge_y)
 		add_child(ledge)
 		ledges.append(ledge)
 		last_ledge = ledge
+		
+		#spawn coin
+		var new_coin = coin_scene.instantiate();
+		var coin_w = new_coin.get_node("Sprite2D").texture.get_width()
+		var coin_h = new_coin.get_node("Sprite2D").texture.get_height()
+		new_coin.position = Vector2i(ledge_x + (ledge_w / 2) - coin_w, ledge_y - 48 - coin_h)
+		new_coin.coin_collected.connect(hit_coin)
+		add_child(new_coin)
+		coins.append(new_coin)
 
 func generate_obs():
 	#generate ground obstacles
@@ -186,6 +210,13 @@ func add_obs(obs, x, y):
 func remove_obs(obs):
 	obs.queue_free()
 	obstacles.erase(obs)
+
+func hit_coin(coin_hit):
+	for coin in coins:
+		if coin == coin_hit:
+			coin.queue_free()
+			coins.erase(coin)
+	score += COIN_BONUS	
 	
 func hit_obs(body):
 	if body.name == "Dino":
