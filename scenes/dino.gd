@@ -3,8 +3,15 @@ extends CharacterBody2D
 const GRAVITY : int = 4200
 const JUMP_SPEED : int = -1800
 
+var game_active : bool
+
+func _ready():
+	game_active = false
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _physics_process(delta):
+	if game_active == false:
+		return
 	velocity.y += GRAVITY * delta
 	if is_on_floor():
 		if not get_parent().game_running:

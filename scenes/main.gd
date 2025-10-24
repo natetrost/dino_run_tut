@@ -55,6 +55,7 @@ func new_game():
 	score = 0
 	show_score()
 	game_running = false
+	$Dino.game_active = false
 	get_tree().paused = false
 	difficulty = 0
 	
@@ -155,6 +156,9 @@ func _process(delta):
 	else:
 		if Input.is_action_pressed("ui_accept"):
 			game_running = true
+			Input.action_release("ui_accept")
+			$Dino.game_active = true
+
 			$HUD.get_node("StartLabel").hide()
 
 func generate_ledge():
